@@ -1,0 +1,20 @@
+---
+pxe_subnet: 192.168.200.0
+pxe_netmask: 255.255.255.0
+
+router: 192.168.200.1
+dns: 8.8.8.8
+subnet_mask: 255.255.255.0
+dhcp_range_start: 192.168.200.202
+dhcp_range_end: 192.168.200.210
+
+cobbler_server_ip: 192.168.200.201
+
+iso_filename: CentOS-7-x86_64-Minimal-1810.iso
+iso_mount_point: /mnt
+os_release: CentOS-7
+cpu_arch: x86_64
+
+systems_provisioned:
+    - { name: 'myclient1', profile: '{{ os_release }}-{{ cpu_arch }}', interface: 'ens192', mac: '00:0c:29:78:c9:b7', ip_address: '192.168.200.202', netmask: '255.255.255.0', static: '1', gateway: '192.168.200.1', hostname: 'myclient1', name_servers: '8.8.8.8 8.8.4.4' }
+    - { name: 'myclient2', profile: '{{ os_release }}-{{ cpu_arch }}', interface: 'ens192', mac: '00:0c:29:78:c9:b8', ip_address: '192.168.200.203', netmask: '255.255.255.0', static: '1', gateway: '192.168.200.1', hostname: 'myclient2', name_servers: '8.8.8.8 8.8.4.4' }

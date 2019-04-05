@@ -1,0 +1,119 @@
+---
+- name: Set cobbler server
+  hosts: localhost
+  become: True
+
+  vars_files:
+    - infra-vars.yml
+
+  vars_prompt:
+    - name: "root_password_crypted"
+      prompt: "Enter OS root password to be installed"
+      private: yes
+      encrypt: "md5_crypt"
+      confirm: yes
+
+  tasks:
+    - name: Disable SELinux in /etc/selinux/config file
+      selinux:
+        state: disabled
+
+    - name: Set SELinux to permissive
+      command: setenforce 0
+      ignore_errors: True
+
+    - name: Stop firewalld
+      service:
+        name: firewalld
+        state: stopped
+
+    - name: Disable firewalld
+      service:
+        name: firewalld
+        enabled: no
+
+    - name: Install packages required
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - epel-release
+        - cobbler
+        - pykickstart
+        - dhcp
+        - xinetd
+
+    - name: Enable services
+      service:
+        name: "{{ item }}"
+        enabled: yes
+      loop:
+        - cobblerd
+        - httpd
+        - rsyncd
+        - dhcpd
+        - xinetd
+        - tftp
+
+    - name: Start services
+      service:
+        name: "{{ item }}"
+        state: started
+      loop:
+        - cobblerd
+        - httpd
+        - rsyncd
+        - xinetd
+        - tftp
+
+    - name: Copy dhcp.template file
+      template:
+        src: templates/dhcp.template.j2
+        dest: /etc/cobbler/dhcp.template
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Copy settings file
+      template:
+        src: templates/settings.j2
+        dest: /etc/cobbler/settings
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Set tftp config disable yes to no
+      replace:
+        path: /etc/xinetd.d/tftp
+        regexp: 'disable                 = yes'
+        replace: 'disable                 = no'
+
+    - name: Get boot loaders into /var/lib/cobbler/loaders
+      command: cobbler get-loaders
+
+    - name: Sync cobbler
+      command: cobbler sync
+
+    - name: Mount OS image
+      mount:
+        path: "{{ iso_mount_point }}"
+        src: "{{ playbook_dir }}/{{ iso_filename }}"
+        fstype: iso9660
+        opts: loop,ro
+        state: mounted
+
+    - name: Import distro and profile
+      command: cobbler import --name="{{ os_release }}" --arch="{{ cpu_arch }}" --path="{{ iso_mount_point }}"
+      ignore_errors: True
+
+    - name: Add systems
+      command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --interface={{ item.interface }} --mac={{ item.mac }} --ip-address={{ item.ip_address }} --netmask={{ item.netmask }} --static={{ item.static }} --gateway={{ item.gateway }} --hostname={{ item.hostname }} --name-servers={{ item.name_servers }}
+      loop: "{{ systems_provisioned }}"
+
+    - name: Restart cobblerd
+      service:
+        name: cobblerd
+        state: restarted
+
+    - name: Sync cobbler
+      command: cobbler sync
