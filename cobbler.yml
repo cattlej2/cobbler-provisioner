@@ -8,7 +8,15 @@
 
   vars_prompt:
     - name: "root_password_crypted"
-      prompt: "Enter OS root password to be installed"
+      prompt: "Root password to be set"
+      private: yes
+      encrypt: "md5_crypt"
+      confirm: yes
+    - name: "ks_username"
+      prompt: "User name to be created"
+      private: no
+    - name: "ks_userpw"
+      prompt: "User password"
       private: yes
       encrypt: "md5_crypt"
       confirm: yes
@@ -82,11 +90,19 @@
         group: root
         mode: "0644"
 
+    - name: Copy kickstart file
+      template:
+        src: templates/sample_end.ks.j2
+        dest: /var/lib/cobbler/kickstarts/sample_end.ks
+        owner: root
+        group: root
+        mode: "0644"
+
     - name: Set tftp config disable yes to no
       replace:
         path: /etc/xinetd.d/tftp
-        regexp: 'disable                 = yes'
-        replace: 'disable                 = no'
+        regexp: '(disable\s*?=)\s*?.*$'
+        replace: '\1 no'
 
     - name: Get boot loaders into /var/lib/cobbler/loaders
       command: cobbler get-loaders
@@ -107,7 +123,7 @@
       ignore_errors: True
 
     - name: Add systems
-      command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --interface={{ item.interface }} --mac={{ item.mac }} --ip-address={{ item.ip_address }} --netmask={{ item.netmask }} --static={{ item.static }} --gateway={{ item.gateway }} --hostname={{ item.hostname }} --name-servers={{ item.name_servers }}
+      command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --interface={{ item.interface }} --mac={{ item.mac }} --ip-address={{ item.ip_address }} --netmask={{ item.netmask }} --static={{ item.static }} --mtu={{ item.mtu }} --gateway={{ item.gateway }} --hostname={{ item.hostname }} --name-servers={{ item.name_servers }}
       loop: "{{ systems_provisioned }}"
 
     - name: Restart cobblerd

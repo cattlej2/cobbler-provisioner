@@ -15,6 +15,8 @@ iso_mount_point: /mnt
 os_release: CentOS-7
 cpu_arch: x86_64
 
+ks_timezone: Asia/Seoul
+ks_ntpservers: 192.168.200.201,time.bora.net
+
 systems_provisioned:
-    - { name: 'myclient1', profile: '{{ os_release }}-{{ cpu_arch }}', interface: 'ens192', mac: '00:0c:29:78:c9:b7', ip_address: '192.168.200.202', netmask: '255.255.255.0', static: '1', gateway: '192.168.200.1', hostname: 'myclient1', name_servers: '8.8.8.8 8.8.4.4' }
-    - { name: 'myclient2', profile: '{{ os_release }}-{{ cpu_arch }}', interface: 'ens192', mac: '00:0c:29:78:c9:b8', ip_address: '192.168.200.203', netmask: '255.255.255.0', static: '1', gateway: '192.168.200.1', hostname: 'myclient2', name_servers: '8.8.8.8 8.8.4.4' }
+    - { name: 'myclient1', profile: '{{ os_release }}-{{ cpu_arch }}', interface: 'ens192', mac: '00:0c:29:78:c9:b7', ip_address: '192.168.200.202', netmask: '255.255.255.0', static: '1', mtu: '9000', gateway: '192.168.200.1', hostname: 'myclient1', name_servers: '8.8.8.8 8.8.4.4' }
