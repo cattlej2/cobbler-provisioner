@@ -123,7 +123,20 @@
       ignore_errors: True
 
     - name: Add systems
-      command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --interface={{ item.interface }} --mac={{ item.mac }} --ip-address={{ item.ip_address }} --netmask={{ item.netmask }} --static={{ item.static }} --mtu={{ item.mtu }} --gateway={{ item.gateway }} --hostname={{ item.hostname }} --name-servers={{ item.name_servers }}
+      #command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --interface={{ item.interface }} --mac={{ item.mac }} --ip-address={{ item.ip_address }} --netmask={{ item.netmask }} --static={{ item.static }} --mtu={{ item.mtu }} --gateway={{ item.gateway }} --hostname={{ item.hostname }} --name-servers={{ item.name_servers }}
+      command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --gateway={{ item.gateway }} --hostname={{ item.hostname }} --name-servers={{ item.name_servers }}
+      loop: "{{ systems_provisioned }}"
+
+    - name: Add 1st interface cfg for bonding
+      command: cobbler system edit --name={{ item.name }} --interface={{ item.interface_1st }} --mac={{ item.mac_1st }} --interface-type=bond_slave --interface-master=bond0
+      loop: "{{ systems_provisioned }}"
+
+    - name: Add 2nd interface cfg for bonding
+      command: cobbler system edit --name={{ item.name }} --interface={{ item.interface_2nd }} --mac={{ item.mac_2nd }} --interface-type=bond_slave --interface-master=bond0
+      loop: "{{ systems_provisioned }}"
+
+    - name: Add a bonded interface cfg for bonding
+      command: cobbler system edit --name={{ item.name }} --interface=bond0 --interface-type=bond --bonding-opts={{ item.bonding_opts }} --ip-address={{ item.ip_address }} --netmask={{ item.netmask }} --static=1 --mtu={{ item.mtu }}
       loop: "{{ systems_provisioned }}"
 
     - name: Restart cobblerd

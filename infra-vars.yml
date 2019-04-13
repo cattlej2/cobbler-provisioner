@@ -18,5 +18,21 @@ cpu_arch: x86_64
 ks_timezone: Asia/Seoul
 ks_ntpservers: 192.168.200.201,time.bora.net
 
+# Use the following bonding mode examples
+# active-backup "mode=1 miimon=100"
+# active-active "mode=4 miimon=100 xmit_hash_policy=layer2+3" (Switch configuration required)
+
 systems_provisioned:
-    - { name: 'myclient1', profile: '{{ os_release }}-{{ cpu_arch }}', interface: 'ens192', mac: '00:0c:29:78:c9:b7', ip_address: '192.168.200.202', netmask: '255.255.255.0', static: '1', mtu: '9000', gateway: '192.168.200.1', hostname: 'myclient1', name_servers: '8.8.8.8 8.8.4.4' }
+  - name: myclient1
+    profile: "{{ os_release }}-{{ cpu_arch }}"
+    gateway: 192.168.200.1
+    hostname: myclient1
+    name_servers: "'8.8.8.8 8.8.4.4'"
+    interface_1st: ens192
+    mac_1st: 00:0c:29:78:c9:b7
+    interface_2nd: ens224
+    mac_2nd: 00:0c:29:78:c9:c1
+    bonding_opts: "'mode=1 miimon=100'"
+    ip_address: 192.168.200.202
+    netmask: 255.255.255.0
+    mtu: 9000
