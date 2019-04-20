@@ -1,0 +1,28 @@
+---
+- name: Stop cobbler server
+  hosts: localhost
+  become: True
+
+  tasks:
+    - name: Stop services
+      service:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - cobblerd
+        - rsyncd
+        - dhcpd
+        - xinetd
+        - tftp
+
+    - name: Disable services
+      service:
+        name: "{{ item }}"
+        enabled: no
+      loop:
+        - cobblerd
+        - rsyncd
+        - dhcpd
+        - xinetd
+        - tftp
+

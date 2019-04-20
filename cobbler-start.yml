@@ -7,18 +7,18 @@
     - infra-vars.yml
 
   vars_prompt:
-    - name: "root_password_crypted"
-      prompt: "Root password to be set"
+    - name: root_password_crypted
+      prompt: Root password to be set
       private: yes
-      encrypt: "md5_crypt"
+      encrypt: md5_crypt
       confirm: yes
-    - name: "ks_username"
-      prompt: "User name to be created"
+    - name: ks_username
+      prompt: User name to be created
       private: no
-    - name: "ks_userpw"
-      prompt: "User password"
+    - name: ks_user_password_crypted
+      prompt: User password
       private: yes
-      encrypt: "md5_crypt"
+      encrypt: md5_crypt
       confirm: yes
 
   tasks:
@@ -71,6 +71,7 @@
         - cobblerd
         - httpd
         - rsyncd
+        - dhcpd
         - xinetd
         - tftp
 
@@ -80,7 +81,7 @@
         dest: /etc/cobbler/dhcp.template
         owner: root
         group: root
-        mode: "0644"
+        mode: 0644
 
     - name: Copy settings file
       template:
@@ -88,7 +89,7 @@
         dest: /etc/cobbler/settings
         owner: root
         group: root
-        mode: "0644"
+        mode: 0644
 
     - name: Copy kickstart file
       template:
@@ -96,7 +97,7 @@
         dest: /var/lib/cobbler/kickstarts/sample_end.ks
         owner: root
         group: root
-        mode: "0644"
+        mode: 0644
 
     - name: Set tftp config disable yes to no
       replace:
@@ -119,12 +120,29 @@
         state: mounted
 
     - name: Import distro and profile
-      command: cobbler import --name="{{ os_release }}" --arch="{{ cpu_arch }}" --path="{{ iso_mount_point }}"
+      command: cobbler import --name={{ os_release }} --arch={{ cpu_arch }} --path={{ iso_mount_point }}
+      ignore_errors: True
+
+    - name: Create repo mirrors on the cobbler server
+      command: cobbler repo add --name={{ item.name }} --mirror={{ item.url }} --keep-updated=Y --mirror-locally=Y --arch=x86_64 --breed=yum
+      loop: "{{ mirror_list }}"
+      register: result
+      ignore_errors: True
+
+    - name: Sync repo
+      command: cobbler reposync
+      when: result is succeeded
+
+    - name: Add repos to the profile
+      command: cobbler profile edit --name={{ os_release }}-{{ cpu_arch }} --repos="{{ mirror_dict.keys() | join(' ') }}"
+
+    - name: Remove the existing systems
+      command: cobbler system remove --name={{ item.name }}
+      loop: "{{ systems_provisioned }}"
       ignore_errors: True
 
     - name: Add systems
-      #command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --interface={{ item.interface }} --mac={{ item.mac }} --ip-address={{ item.ip_address }} --netmask={{ item.netmask }} --static={{ item.static }} --mtu={{ item.mtu }} --gateway={{ item.gateway }} --hostname={{ item.hostname }} --name-servers={{ item.name_servers }}
-      command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --gateway={{ item.gateway }} --hostname={{ item.hostname }} --name-servers={{ item.name_servers }}
+      command: cobbler system add --name={{ item.name }} --profile={{ item.profile }} --gateway={{ item.gateway }} --hostname={{ item.name }} --name-servers={{ item.name_servers }}
       loop: "{{ systems_provisioned }}"
 
     - name: Add 1st interface cfg for bonding

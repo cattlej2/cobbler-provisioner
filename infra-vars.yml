@@ -1,38 +1,106 @@
 ---
-pxe_subnet: 192.168.200.0
+pxe_subnet: 192.168.201.0
 pxe_netmask: 255.255.255.0
 
-router: 192.168.200.1
+router: 192.168.201.1
 dns: 8.8.8.8
 subnet_mask: 255.255.255.0
-dhcp_range_start: 192.168.200.202
-dhcp_range_end: 192.168.200.210
+dhcp_range_start: 192.168.201.105
+dhcp_range_end: 192.168.201.210
 
-cobbler_server_ip: 192.168.200.201
+cobbler_server_ip: 192.168.201.104
 
-iso_filename: CentOS-7-x86_64-Minimal-1810.iso
+iso_filename: CentOS-7-x86_64-DVD-1810.iso
 iso_mount_point: /mnt
 os_release: CentOS-7
 cpu_arch: x86_64
 
+# Boot mode [bios|uefi]
+boot_mode: bios
+
+# Kickstart values
 ks_timezone: Asia/Seoul
-ks_ntpservers: 192.168.200.201,time.bora.net
+ks_ntpservers: 192.168.201.104
+
+# The first block device name to be partitioned
+ks_first_disk_device_name: vda
+
+# The logical volume size as a percentage(%) mounted at / and /var/log
+ks_root_size_percent: 85
+ks_log_size_percent: 15
+
+# repo mirror list
+mirror_list:
+  - name: epel-7
+    url: http://mirror.kakao.com/epel/7/x86_64
+  - name: ceph-luminous
+    url: http://download.ceph.com/rpm-luminous/el7/x86_64
+  - name: docker-ce
+    url: https://download.docker.com/linux/centos/7/x86_64/stable
+
+mirror_dict: "{{ mirror_list | items2dict(key_name='name', value_name='url') }}"
 
 # Use the following bonding mode examples
 # active-backup "mode=1 miimon=100"
 # active-active "mode=4 miimon=100 xmit_hash_policy=layer2+3" (Switch configuration required)
-
 systems_provisioned:
-  - name: myclient1
+  - name: lhj-vpc-001
     profile: "{{ os_release }}-{{ cpu_arch }}"
-    gateway: 192.168.200.1
-    hostname: myclient1
+    gateway: 192.168.201.1
     name_servers: "'8.8.8.8 8.8.4.4'"
-    interface_1st: ens192
-    mac_1st: 00:0c:29:78:c9:b7
-    interface_2nd: ens224
-    mac_2nd: 00:0c:29:78:c9:c1
+    interface_1st: eth0
+    mac_1st: 52:54:00:cf:16:44
+    interface_2nd: eth1
+    mac_2nd: 52:54:00:67:24:e6
     bonding_opts: "'mode=1 miimon=100'"
-    ip_address: 192.168.200.202
+    ip_address: 192.168.201.105
     netmask: 255.255.255.0
-    mtu: 9000
+    mtu: 1500
+  - name: lhj-ceph-001
+    profile: "{{ os_release }}-{{ cpu_arch }}"
+    gateway: 192.168.201.1
+    name_servers: "'8.8.8.8 8.8.4.4'"
+    interface_1st: eth0
+    mac_1st: 52:54:00:9f:76:93
+    interface_2nd: eth1
+    mac_2nd: 52:54:00:34:f9:fb
+    bonding_opts: "'mode=1 miimon=100'"
+    ip_address: 192.168.201.106
+    netmask: 255.255.255.0
+    mtu: 1500
+  - name: lhj-ceph-002
+    profile: "{{ os_release }}-{{ cpu_arch }}"
+    gateway: 192.168.201.1
+    name_servers: "'8.8.8.8 8.8.4.4'"
+    interface_1st: eth0
+    mac_1st: 52:54:00:69:a1:cf
+    interface_2nd: eth1
+    mac_2nd: 52:54:00:eb:3a:62
+    bonding_opts: "'mode=1 miimon=100'"
+    ip_address: 192.168.201.107
+    netmask: 255.255.255.0
+    mtu: 1500
+  - name: lhj-ceph-003
+    profile: "{{ os_release }}-{{ cpu_arch }}"
+    gateway: 192.168.201.1
+    name_servers: "'8.8.8.8 8.8.4.4'"
+    interface_1st: eth0
+    mac_1st: 52:54:00:58:fb:29
+    interface_2nd: eth1
+    mac_2nd: 52:54:00:91:36:d1
+    bonding_opts: "'mode=1 miimon=100'"
+    ip_address: 192.168.201.108
+    netmask: 255.255.255.0
+    mtu: 1500
+  - name: lhj-ceph-004
+    profile: "{{ os_release }}-{{ cpu_arch }}"
+    gateway: 192.168.201.1
+    name_servers: "'8.8.8.8 8.8.4.4'"
+    interface_1st: eth0
+    mac_1st: 52:54:00:5e:16:5c
+    interface_2nd: eth1
+    mac_2nd: 52:54:00:71:59:16
+    bonding_opts: "'mode=1 miimon=100'"
+    ip_address: 192.168.201.109
+    netmask: 255.255.255.0
+    mtu: 1500

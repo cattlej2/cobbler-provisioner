@@ -80,7 +80,7 @@ group {
             filename "undionly.kpxe";
         }
         #else
-        filename "grub/grub-x86_64.efi";
+        filename "{{ 'pxelinux.0' if boot_mode == 'bios' else 'grub/grub-x86_64.efi' }}";
         #end if
         ## Cobbler defaults to $next_server, but some users
         ## may like to use $iface.system.server for proxied setups

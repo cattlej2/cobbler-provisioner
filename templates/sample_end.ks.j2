@@ -37,13 +37,20 @@ services --disabled="ntpd,NetworkManager" --enabled="chronyd"
 skipx
 # System timezone
 timezone {{ ks_timezone }} --isUtc --ntpservers={{ ks_ntpservers }}
-user --groups=wheel --name={{ ks_username }} --password={{ ks_userpw }} --iscrypted --gecos="{{ ks_username }}"
+user --groups=wheel --name={{ ks_username }} --password={{ ks_user_password_crypted }} --iscrypted --gecos="{{ ks_username }}"
 # Install OS instead of upgrade
 install
 # Clear the Master Boot Record
 zerombr
 # Allow anaconda to partition the system as needed
-autopart
+#autopart
+# Disk partitioning information
+part /boot --fstype="xfs" --ondisk={{ ks_first_disk_device_name }} --size=1024
+part /boot/efi --fstype="efi" --ondisk={{ ks_first_disk_device_name }} --size=300
+part pv.root --fstype="lvmpv" --ondisk={{ ks_first_disk_device_name }} --size=1 --grow
+volgroup rootvg --pesize=4096 pv.root
+logvol /var/log  --fstype="xfs" --grow --percent={{ ks_log_size_percent }} --name=loglv --vgname=rootvg
+logvol / --fstype="xfs" --grow --percent={{ ks_root_size_percent }} --name=rootlv --vgname=rootvg
 
 %pre
 $SNIPPET('log_ks_pre')
