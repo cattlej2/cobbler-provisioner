@@ -17,12 +17,12 @@
 
     - name: Create a directory to extract the OS repo package files
       file:
-        path: "/var/www/cobbler/ks_mirror/{{ os_release }}-{{ cpu_arch }}"
+        path: /var/www/cobbler/ks_mirror
         state: directory
 
     - name: Set a symlink of OS repo
       file:
-        src: /mnt
+        src: "{{ iso_mount_point }}"
         dest: "/var/www/cobbler/ks_mirror/{{ os_release }}-{{ cpu_arch }}"
         state: link
 
@@ -33,7 +33,7 @@
 
     - name: Extract the repo packages into /var/www/cobbler/repo_mirror
       unarchive:
-        src: repo_mirror.tar.gz
+        src: "{{ repo_mirror_filename }}"
         dest: /var/www/cobbler/repo_mirror
 
     - name: Set the mirror directory's attributes

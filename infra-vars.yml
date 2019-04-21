@@ -16,6 +16,8 @@ iso_mount_point: /mnt
 os_release: CentOS-7
 cpu_arch: x86_64
 
+repo_mirror_filename: repo_mirror.tar.gz
+
 # Boot mode [bios|uefi]
 boot_mode: bios
 

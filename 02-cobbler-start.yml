@@ -45,7 +45,6 @@
         name: "{{ item }}"
         state: present
       loop:
-        - epel-release
         - cobbler
         - pykickstart
         - dhcp
@@ -53,10 +52,10 @@
         - chrony
 
     - name: Set the chrony config file to allow client access
-      lineinfile:
+      replace:
         path: /etc/chrony.conf
-        regexp: '^allow'
-        line: "allow {{ chrony_client_net }}"
+        regexp: '^#?\s*?(allow)\s*.*$'
+        replace: 'allow {{ chrony_client_net }}'
 
     - name: Enable services
       service:
@@ -79,7 +78,6 @@
         - cobblerd
         - httpd
         - rsyncd
-        - dhcpd
         - xinetd
         - tftp
         - chronyd
