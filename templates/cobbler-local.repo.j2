@@ -1,0 +1,18 @@
+[core-0]
+name=core-0
+baseurl=file:///var/www/cobbler/ks_mirror/{{ os_release }}-{{ cpu_arch }}
+enabled=1
+gpgcheck=0
+priority=1
+
+
+{% for repo in mirror_dict.keys() %}
+[{{ repo }}]
+name={{ repo }}
+baseurl=file:///var/www/cobbler/repo_mirror/{{ repo }}
+enabled=1
+priority=99
+gpgcheck=0
+
+
+{% endfor %}

@@ -93,4 +93,7 @@ sed -i 's/#\s*\?\(PermitRootLogin\)\s*.*$/\1 no/' /etc/ssh/sshd_config
 # Allow wheel group to use sudo without a password
 sed -i 's/\(%wheel\s*ALL=(ALL)\s*ALL\)/# \1/' /etc/sudoers
 sed -i 's/#\s*\(%wheel\s*ALL=(ALL)\s*NOPASSWD:\s*ALL\)/\1/' /etc/sudoers
+# Backup the default repo files
+mkdir /etc/yum.repos.d/default-repos
+mv /etc/yum.repos.d/CentOS-* /etc/yum.repos.d/default-repos/
 %end

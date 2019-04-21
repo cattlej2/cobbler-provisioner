@@ -9,6 +9,7 @@ dhcp_range_start: 192.168.201.105
 dhcp_range_end: 192.168.201.210
 
 cobbler_server_ip: 192.168.201.104
+chrony_client_net: 192.168.201.0/24
 
 iso_filename: CentOS-7-x86_64-DVD-1810.iso
 iso_mount_point: /mnt
@@ -37,6 +38,8 @@ mirror_list:
     url: http://download.ceph.com/rpm-luminous/el7/x86_64
   - name: docker-ce
     url: https://download.docker.com/linux/centos/7/x86_64/stable
+  - name: docker-engine
+    url: https://yum.dockerproject.org/repo/main/centos/7
 
 mirror_dict: "{{ mirror_list | items2dict(key_name='name', value_name='url') }}"
 

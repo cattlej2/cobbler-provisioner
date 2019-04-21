@@ -50,6 +50,13 @@
         - pykickstart
         - dhcp
         - xinetd
+        - chrony
+
+    - name: Set the chrony config file to allow client access
+      lineinfile:
+        path: /etc/chrony.conf
+        regexp: '^allow'
+        line: "allow {{ chrony_client_net }}"
 
     - name: Enable services
       service:
@@ -62,6 +69,7 @@
         - dhcpd
         - xinetd
         - tftp
+        - chronyd
 
     - name: Start services
       service:
@@ -74,6 +82,7 @@
         - dhcpd
         - xinetd
         - tftp
+        - chronyd
 
     - name: Copy dhcp.template file
       template:
@@ -119,6 +128,11 @@
         opts: loop,ro
         state: mounted
 
+    - name: Unlink the OS repo symlink
+      file:
+        path: "/var/www/cobbler/ks_mirror/{{ os_release }}-{{ cpu_arch }}"
+        state: absent
+
     - name: Import distro and profile
       command: cobbler import --name={{ os_release }} --arch={{ cpu_arch }} --path={{ iso_mount_point }}
       ignore_errors: True
@@ -126,12 +140,31 @@
     - name: Create repo mirrors on the cobbler server
       command: cobbler repo add --name={{ item.name }} --mirror={{ item.url }} --keep-updated=Y --mirror-locally=Y --arch=x86_64 --breed=yum
       loop: "{{ mirror_list }}"
-      register: result
+      register: add_repo_result
       ignore_errors: True
 
     - name: Sync repo
       command: cobbler reposync
-      when: result is succeeded
+      when: add_repo_result is succeeded
+      ignore_errors: True
+
+    - name: Copy the local repo file
+      template:
+        src: templates/cobbler-local.repo.j2
+        dest: /etc/yum.repos.d/cobbler-local.repo
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Create a directory to backup the default repo files
+      file:
+        path: /etc/yum.repos.d/default-repos
+        state: directory
+
+    - name: Backup the default repo files
+      shell: mv /etc/yum.repos.d/CentOS-* /etc/yum.repos.d/default-repos/
+      args:
+        removes: /etc/yum.repos.d/CentOS-Base.repo
 
     - name: Add repos to the profile
       command: cobbler profile edit --name={{ os_release }}-{{ cpu_arch }} --repos="{{ mirror_dict.keys() | join(' ') }}"

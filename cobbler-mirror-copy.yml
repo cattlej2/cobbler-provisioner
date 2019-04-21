@@ -1,0 +1,64 @@
+---
+- name: Copy repo mirror to local
+  hosts: localhost
+  become: True
+
+  vars_files:
+    - infra-vars.yml
+
+  tasks:
+    - name: Mount OS image
+      mount:
+        path: "{{ iso_mount_point }}"
+        src: "{{ playbook_dir }}/{{ iso_filename }}"
+        fstype: iso9660
+        opts: loop,ro
+        state: mounted
+
+    - name: Create a directory to extract the OS repo package files
+      file:
+        path: "/var/www/cobbler/ks_mirror/{{ os_release }}-{{ cpu_arch }}"
+        state: directory
+
+    - name: Set a symlink of OS repo
+      file:
+        src: /mnt
+        dest: "/var/www/cobbler/ks_mirror/{{ os_release }}-{{ cpu_arch }}"
+        state: link
+
+    - name: Create a directory to extract the other repo package files
+      file:
+        path: /var/www/cobbler/repo_mirror
+        state: directory
+
+    - name: Extract the repo packages into /var/www/cobbler/repo_mirror
+      unarchive:
+        src: repo_mirror.tar.gz
+        dest: /var/www/cobbler/repo_mirror
+
+    - name: Set the mirror directory's attributes
+      file:
+        path: "/var/www/cobbler/repo_mirror/{{ item }}"
+        owner: root
+        group: apache
+        mode: 0755
+        recurse: yes
+      loop: "{{ mirror_dict.keys() }}"
+
+    - name: Copy the local repo file
+      template:
+        src: templates/cobbler-local.repo.j2
+        dest: /etc/yum.repos.d/cobbler-local.repo
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Create a directory to backup the default repo files
+      file:
+        path: /etc/yum.repos.d/default-repos
+        state: directory
+
+    - name: Backup the default repo files
+      shell: mv /etc/yum.repos.d/CentOS-* /etc/yum.repos.d/default-repos/
+      args:
+        removes: /etc/yum.repos.d/CentOS-Base.repo
