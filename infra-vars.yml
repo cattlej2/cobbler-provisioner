@@ -34,6 +34,10 @@ ks_log_size_percent: 15
 
 # repo mirror list
 mirror_list:
+  - name: updates
+    url: http://mirror.kakao.com/centos/7.6.1810/updates/x86_64
+  - name: extras
+    url: http://mirror.kakao.com/centos/7.6.1810/extras/x86_64
   - name: epel-7
     url: http://mirror.kakao.com/epel/7/x86_64
   - name: ceph-luminous
