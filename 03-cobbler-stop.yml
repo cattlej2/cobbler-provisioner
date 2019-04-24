@@ -4,6 +4,10 @@
   become: True
 
   tasks:
+    - name: Remove the existing systems
+      command: cobbler system remove --name={{ item.name }}
+      loop: "{{ systems_provisioned }}"
+
     - name: Stop services
       service:
         name: "{{ item }}"
