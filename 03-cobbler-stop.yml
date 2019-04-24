@@ -3,6 +3,9 @@
   hosts: localhost
   become: True
 
+  vars_files:
+    - infra-vars.yml
+
   tasks:
     - name: Remove the existing systems
       command: cobbler system remove --name={{ item.name }}
