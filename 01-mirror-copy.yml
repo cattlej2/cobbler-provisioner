@@ -7,24 +7,24 @@
     - infra-vars.yml
 
   tasks:
-    - name: Mount OS image
-      mount:
-        path: "{{ iso_mount_point }}"
-        src: "{{ playbook_dir }}/{{ iso_filename }}"
-        fstype: iso9660
-        opts: loop,ro
-        state: mounted
+#    - name: Mount OS image
+#      mount:
+#        path: "{{ iso_mount_point }}"
+#        src: "{{ playbook_dir }}/{{ iso_filename }}"
+#        fstype: iso9660
+#        opts: loop,ro
+#        state: mounted
 
-    - name: Create a directory to extract the OS repo package files
-      file:
-        path: /var/www/cobbler/ks_mirror
-        state: directory
+#    - name: Create a directory to extract the OS repo package files
+#      file:
+#        path: /var/www/cobbler/ks_mirror
+#        state: directory
 
-    - name: Set a symlink of OS repo
-      file:
-        src: "{{ iso_mount_point }}"
-        dest: "/var/www/cobbler/ks_mirror/{{ os_release }}-{{ cpu_arch }}"
-        state: link
+#    - name: Set a symlink of OS repo
+#      file:
+#        src: "{{ iso_mount_point }}"
+#        dest: "/var/www/cobbler/ks_mirror/{{ os_release }}-{{ cpu_arch }}"
+#        state: link
 
     - name: Create a directory to extract the other repo package files
       file:
@@ -36,7 +36,7 @@
         src: "{{ repo_mirror_filename }}"
         dest: /var/www/cobbler/repo_mirror
 
-    - name: Set the mirror directory's attributes
+    - name: Set the repo mirror directory's attributes
       file:
         path: "/var/www/cobbler/repo_mirror/{{ item }}"
         owner: root
@@ -62,3 +62,51 @@
       shell: mv /etc/yum.repos.d/CentOS-* /etc/yum.repos.d/default-repos/
       args:
         removes: /etc/yum.repos.d/CentOS-Base.repo
+
+    - name: Create a directory to extract the pypi package files
+      file:
+        path: /pypi
+        state: directory
+
+    - name: Extract the pypi packages into /pypi
+      unarchive:
+        src: "{{ pypi_mirror_filename }}"
+        dest: /pypi
+
+    - name: Set the pypi mirror directory's attributes
+      file:
+        path: "/pypi"
+        owner: root
+        group: root
+        recurse: yes
+
+    - name: Copy pypi-server excute file to /pypi
+      copy:
+        src: files/pypi-server-standalone.py
+        dest: /pypi
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Run pypi-server
+      command: /pypi/pypi-server-standalone.py -p 8080 /pypi/pypi-packages &
+
+    - name: Run pypi-server at system boot
+      lineinfile:
+        path: /etc/rc.d/rc.local
+        insertafter: EOF
+        line: "/pypi/pypi-server-standalone.py -p 8080 /pypi/pypi-packages &"
+
+    - name: Create a directory for pip.conf
+      file:
+        path: /root/.pip
+        state: directory
+
+    - name: Copy pip.conf
+      template:
+        src: templates/pip.conf.j2
+        dest: /root/.pip/pip.conf
+        owner: root
+        group: root
+        mode: 0644
+
