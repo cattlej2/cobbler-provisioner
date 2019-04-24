@@ -11,7 +11,7 @@ dhcp_range_end: 192.168.201.210
 cobbler_server_ip: 192.168.201.104
 chrony_client_net: 192.168.201.0/24
 
-iso_filename: CentOS-7-x86_64-DVD-1810.iso
+iso_filename: CentOS-7-x86_64-Minimal-1810.iso
 iso_mount_point: /mnt
 os_release: CentOS-7
 cpu_arch: x86_64

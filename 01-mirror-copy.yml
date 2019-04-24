@@ -30,17 +30,19 @@
       file:
         path: /var/www/cobbler/repo_mirror
         state: directory
+      register: repo_mirror_dir
 
     - name: Extract the repo packages into /var/www/cobbler/repo_mirror
       unarchive:
         src: "{{ repo_mirror_filename }}"
         dest: /var/www/cobbler/repo_mirror
+      when: repo_mirror_dir.changed
 
     - name: Set the repo mirror directory's attributes
       file:
         path: "/var/www/cobbler/repo_mirror/{{ item }}"
         owner: root
-        group: apache
+        group: root
         mode: 0755
         recurse: yes
       loop: "{{ mirror_dict.keys() }}"
@@ -88,14 +90,21 @@
         group: root
         mode: 0755
 
-    - name: Run pypi-server
-      command: /pypi/pypi-server-standalone.py -p 8080 /pypi/pypi-packages &
-
     - name: Run pypi-server at system boot
       lineinfile:
         path: /etc/rc.d/rc.local
         insertafter: EOF
         line: "/pypi/pypi-server-standalone.py -p 8080 /pypi/pypi-packages &"
+
+    - name: Give execute permission to rc.local
+      file:
+        path: /etc/rc.d/rc.local
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Run pypi-server
+      shell: "/etc/rc.d/rc.local"
 
     - name: Create a directory for pip.conf
       file:

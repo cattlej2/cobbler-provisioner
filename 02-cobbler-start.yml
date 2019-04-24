@@ -188,10 +188,10 @@
       command: cobbler system edit --name={{ item.name }} --interface=bond0 --interface-type=bond --bonding-opts={{ item.bonding_opts }} --ip-address={{ item.ip_address }} --netmask={{ item.netmask }} --static=1 --mtu={{ item.mtu }}
       loop: "{{ systems_provisioned }}"
 
-#    - name: Restart cobblerd
-#      service:
-#        name: cobblerd
-#        state: restarted
+    - name: Restart cobblerd
+      service:
+        name: cobblerd
+        state: restarted
 
     - name: Sync cobbler
       command: cobbler sync
