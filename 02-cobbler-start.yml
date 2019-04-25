@@ -141,10 +141,10 @@
       register: add_repo_result
       ignore_errors: True
 
-#    - name: Sync repo
-#      command: cobbler reposync
-#      when: add_repo_result is succeeded
-#      ignore_errors: True
+    - name: Sync repo
+      command: cobbler reposync
+      when: add_repo_result is succeeded and local_yum_repo
+      ignore_errors: True
 
     - name: Copy the local repo file
       template:
@@ -153,16 +153,19 @@
         owner: root
         group: root
         mode: 0644
+      when: local_yum_repo
 
     - name: Create a directory to backup the default repo files
       file:
         path: /etc/yum.repos.d/default-repos
         state: directory
+      when: local_yum_repo
 
     - name: Backup the default repo files
       shell: mv /etc/yum.repos.d/CentOS-* /etc/yum.repos.d/default-repos/
       args:
         removes: /etc/yum.repos.d/CentOS-Base.repo
+      when: local_yum_repo
 
     - name: Add repos to the profile
       command: cobbler profile edit --name={{ os_release }}-{{ cpu_arch }} --repos="{{ mirror_dict.keys() | join(' ') }}"

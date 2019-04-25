@@ -94,6 +94,8 @@ sed -i 's/#\s*\?\(PermitRootLogin\)\s*.*$/\1 no/' /etc/ssh/sshd_config
 sed -i 's/\(%wheel\s*ALL=(ALL)\s*ALL\)/# \1/' /etc/sudoers
 sed -i 's/#\s*\(%wheel\s*ALL=(ALL)\s*NOPASSWD:\s*ALL\)/\1/' /etc/sudoers
 # Backup the default repo files
+{% if local_yum_repo %}
 mkdir /etc/yum.repos.d/default-repos
 mv /etc/yum.repos.d/CentOS-* /etc/yum.repos.d/default-repos/
+{% endif %}
 %end
