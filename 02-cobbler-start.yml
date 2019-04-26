@@ -112,6 +112,19 @@
         regexp: '(disable\s*?=)\s*?.*$'
         replace: '\1 no'
 
+    - name: Set httpd listen port
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^(Listen)\s*?.*$'
+        replace: '\1 {{ cobbler_httpd_port }}'
+      register: listen_port
+
+    - name: Restart httpd service
+      service:
+        name: httpd
+        state: restarted
+      when: listen_port.changed
+
     - name: Get boot loaders into /var/lib/cobbler/loaders
       command: cobbler get-loaders
 

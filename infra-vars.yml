@@ -5,10 +5,11 @@ pxe_netmask: 255.255.255.0
 router: 192.168.201.1
 dns: 8.8.8.8
 subnet_mask: 255.255.255.0
-dhcp_range_start: 192.168.201.105
+dhcp_range_start: 192.168.201.104
 dhcp_range_end: 192.168.201.210
 
-cobbler_server_ip: 192.168.201.104
+cobbler_server_ip: 192.168.201.103
+cobbler_httpd_port: 8888
 chrony_client_net: 192.168.201.0/24
 
 iso_filename: CentOS-7-x86_64-Minimal-1810.iso
@@ -18,7 +19,7 @@ cpu_arch: x86_64
 
 local_yum_repo: false
 local_pypi_repo: false
-repo_mirror_filename: repo_mirror.tar.gz
+yum_mirror_filename: repo_mirror.tar.gz
 pypi_mirror_filename: pypi-packages.tar.gz
 
 # Boot mode [bios|uefi]
@@ -26,7 +27,7 @@ boot_mode: bios
 
 # Kickstart values
 ks_timezone: Asia/Seoul
-ks_ntpservers: 192.168.201.104
+ks_ntpservers: 192.168.201.103
 
 # The first block device name to be partitioned
 ks_first_disk_device_name: vda
@@ -58,6 +59,18 @@ mirror_dict: "{{ mirror_list | items2dict(key_name='name', value_name='url') }}"
 # active-backup "mode=1 miimon=100"
 # active-active "mode=4 miimon=100 xmit_hash_policy=layer2+3" (Switch configuration required)
 systems_provisioned:
+  - name: lhj-control-001
+    profile: "{{ os_release }}-{{ cpu_arch }}"
+    gateway: 192.168.201.1
+    name_servers: "'8.8.8.8 8.8.4.4'"
+    interface_1st: eth0
+    mac_1st: 52:54:00:2c:c1:32
+    interface_2nd: eth1
+    mac_2nd: 52:54:00:0f:5e:b2
+    bonding_opts: "'mode=1 miimon=100'"
+    ip_address: 192.168.201.104
+    netmask: 255.255.255.0
+    mtu: 1500
   - name: lhj-vpc-001
     profile: "{{ os_release }}-{{ cpu_arch }}"
     gateway: 192.168.201.1

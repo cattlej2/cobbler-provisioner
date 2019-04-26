@@ -38,7 +38,7 @@ enable_gpxe: 0
 enable_menu: 1
 func_auto_setup: 0
 func_master: overlord.example.org
-http_port: 8888
+http_port: {{ cobbler_httpd_port }}
 isc_set_host_name: 0
 iso_template_dir: /etc/cobbler/iso
 kerberos_realm: EXAMPLE.COM

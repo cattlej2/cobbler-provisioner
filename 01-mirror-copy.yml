@@ -34,7 +34,7 @@
 
     - name: Extract the repo packages into /var/www/cobbler/repo_mirror
       unarchive:
-        src: "{{ repo_mirror_filename }}"
+        src: "{{ yum_mirror_filename }}"
         dest: /var/www/cobbler/repo_mirror
       when: repo_mirror_dir.changed
 
