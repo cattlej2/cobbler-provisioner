@@ -111,7 +111,7 @@
         path: /root/.pip
         state: directory
 
-    - name: Copy pip.conf
+    - name: Create pip.conf
       template:
         src: templates/pip.conf.j2
         dest: /root/.pip/pip.conf

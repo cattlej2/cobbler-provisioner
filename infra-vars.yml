@@ -17,8 +17,8 @@ iso_mount_point: /mnt
 os_release: CentOS-7
 cpu_arch: x86_64
 
-local_yum_repo: false
-local_pypi_repo: false
+reposync_from_internet: True
+local_yum_repo: True
 yum_mirror_filename: repo_mirror.tar.gz
 pypi_mirror_filename: pypi-packages.tar.gz
 
@@ -53,6 +53,7 @@ mirror_list:
   - name: docker-engine
     url: https://yum.dockerproject.org/repo/main/centos/7
 
+# mirror dictionary { name : url }
 mirror_dict: "{{ mirror_list | items2dict(key_name='name', value_name='url') }}"
 
 # Use the following bonding mode examples

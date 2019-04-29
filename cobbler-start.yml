@@ -8,15 +8,15 @@
 
   vars_prompt:
     - name: root_password_crypted
-      prompt: Root password to be set
+      prompt: ROOT PASSWORD
       private: yes
       encrypt: md5_crypt
       confirm: yes
     - name: ks_username
-      prompt: User name to be created
+      prompt: USER CREATION
       private: no
     - name: ks_user_password_crypted
-      prompt: User password
+      prompt: USER PASSWORD
       private: yes
       encrypt: md5_crypt
       confirm: yes
@@ -26,9 +26,13 @@
       selinux:
         state: disabled
 
+    - name: Check the current SELinux status
+      command: getenforce
+      register: getenforce_output
+
     - name: Set SELinux to permissive
       command: setenforce 0
-      ignore_errors: True
+      when: getenforce_output.stdout == 'Enforcing'
 
     - name: Stop firewalld
       service:
@@ -151,34 +155,11 @@
     - name: Create repo mirrors on the cobbler server
       command: cobbler repo add --name={{ item.name }} --mirror={{ item.url }} --keep-updated=Y --mirror-locally=Y --arch=x86_64 --breed=yum
       loop: "{{ mirror_list }}"
-      register: add_repo_result
       ignore_errors: True
 
     - name: Sync repo
       command: cobbler reposync
-      when: add_repo_result is succeeded and local_yum_repo
-      ignore_errors: True
-
-    - name: Copy the local repo file
-      template:
-        src: templates/cobbler-local.repo.j2
-        dest: /etc/yum.repos.d/cobbler-local.repo
-        owner: root
-        group: root
-        mode: 0644
-      when: local_yum_repo
-
-    - name: Create a directory to backup the default repo files
-      file:
-        path: /etc/yum.repos.d/default-repos
-        state: directory
-      when: local_yum_repo
-
-    - name: Backup the default repo files
-      shell: mv /etc/yum.repos.d/CentOS-* /etc/yum.repos.d/default-repos/
-      args:
-        removes: /etc/yum.repos.d/CentOS-Base.repo
-      when: local_yum_repo
+      when: reposync_from_internet
 
     - name: Add repos to the profile
       command: cobbler profile edit --name={{ os_release }}-{{ cpu_arch }} --repos="{{ mirror_dict.keys() | join(' ') }}"
