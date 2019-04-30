@@ -132,6 +132,11 @@
     - name: Get boot loaders into /var/lib/cobbler/loaders
       command: cobbler get-loaders
 
+    - name: Restart cobblerd
+      service:
+        name: cobblerd
+        state: restarted
+
     - name: Sync cobbler
       command: cobbler sync
 

@@ -106,15 +106,18 @@
     - name: Run pypi-server
       shell: "/etc/rc.d/rc.local"
 
-    - name: Create a directory for pip.conf
-      file:
-        path: /root/.pip
-        state: directory
-
     - name: Create pip.conf
       template:
         src: templates/pip.conf.j2
-        dest: /root/.pip/pip.conf
+        dest: /etc/pip.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Create k8s.conf for httpd
+      copy:
+        src: files/k8s.conf
+        dest: /etc/httpd/conf.d
         owner: root
         group: root
         mode: 0644
