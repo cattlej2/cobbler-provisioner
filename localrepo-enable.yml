@@ -69,11 +69,13 @@
       file:
         path: /pypi
         state: directory
+      tags: pypi
 
     - name: Extract the pypi packages into /pypi
       unarchive:
         src: "{{ pypi_mirror_filename }}"
         dest: /pypi
+      tags: pypi
 
     - name: Set the pypi mirror directory's attributes
       file:
@@ -81,6 +83,7 @@
         owner: root
         group: root
         recurse: yes
+      tags: pypi
 
     - name: Copy pypi-server excute file to /pypi
       copy:
@@ -89,12 +92,14 @@
         owner: root
         group: root
         mode: 0755
+      tags: pypi
 
     - name: Run pypi-server at system boot
       lineinfile:
         path: /etc/rc.d/rc.local
         insertafter: EOF
         line: "/pypi/pypi-server-standalone.py -p 8080 /pypi/pypi-packages &"
+      tags: pypi
 
     - name: Give execute permission to rc.local
       file:
@@ -102,9 +107,11 @@
         owner: root
         group: root
         mode: 0755
+      tags: pypi
 
     - name: Run pypi-server
       shell: "/etc/rc.d/rc.local"
+      tags: pypi
 
     - name: Create pip.conf
       template:
@@ -113,6 +120,21 @@
         owner: root
         group: root
         mode: 0644
+      tags: pypi
+
+    - name: Extract the k8s files into /var/www
+      unarchive:
+        src: "{{ k8s_filename }}"
+        dest: /var/www
+      tags: k8s
+
+    - name: Set the k8s directory's attributes
+      file:
+        path: "/var/www/k8s"
+        owner: root
+        group: root
+        recurse: yes
+      tags: k8s
 
     - name: Create k8s.conf for httpd
       copy:
@@ -121,4 +143,5 @@
         owner: root
         group: root
         mode: 0644
+      tags: k8s
 
