@@ -1,3 +1,4 @@
 *.retry
 *.iso
 *.tar.gz
+files/k8s/
