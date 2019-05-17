@@ -136,6 +136,12 @@
         recurse: yes
       tags: k8s
 
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+      tags: k8s
+
     - name: Create k8s.conf for httpd
       copy:
         src: files/k8s.conf
