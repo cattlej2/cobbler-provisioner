@@ -65,16 +65,38 @@
       args:
         removes: /etc/yum.repos.d/CentOS-Base.repo
 
+    - name: Create a directory to extract the loaders archive file
+      file:
+        path: /var/lib/cobbler/loaders
+        state: directory
+      register: loaders_dir
+
+    - name: Extract the loaders archive file into /var/lib/cobbler
+      unarchive:
+        src: "{{ loaders_filename }}"
+        dest: /var/lib/cobbler
+      when: loaders_dir.changed
+
+    - name: Set the loaders directory's attributes
+      file:
+        path: "/var/lib/cobbler/loaders"
+        owner: root
+        group: root
+        recurse: yes
+      when: loaders_dir.changed
+
     - name: Create a directory to extract the pypi package files
       file:
         path: /pypi
         state: directory
+      register: pypi_dir
       tags: pypi
 
     - name: Extract the pypi packages into /pypi
       unarchive:
         src: "{{ pypi_mirror_filename }}"
         dest: /pypi
+      when: pypi_dir.changed
       tags: pypi
 
     - name: Set the pypi mirror directory's attributes
@@ -83,6 +105,7 @@
         owner: root
         group: root
         recurse: yes
+      when: pypi_dir.changed
       tags: pypi
 
     - name: Copy pypi-server excute file to /pypi
@@ -122,10 +145,18 @@
         mode: 0644
       tags: pypi
 
+    - name: Create a directory to extract the k8s files
+      file:
+        path: /var/www/k8s
+        state: directory
+      register: k8s_dir
+      tags: k8s
+
     - name: Extract the k8s files into /var/www
       unarchive:
         src: "{{ k8s_filename }}"
         dest: /var/www
+      when: k8s_dir.changed
       tags: k8s
 
     - name: Set the k8s directory's attributes
@@ -134,6 +165,7 @@
         owner: root
         group: root
         recurse: yes
+      when: k8s_dir.changed
       tags: k8s
 
     - name: Install httpd

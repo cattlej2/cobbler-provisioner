@@ -22,6 +22,7 @@ local_yum_repo: True
 yum_mirror_filename: repo_mirror.tar.gz
 pypi_mirror_filename: pypi-packages.tar.gz
 k8s_filename: k8s.tar.gz
+loaders_filename: loaders.tar.gz
 
 # Boot mode [bios|uefi]
 boot_mode: bios
