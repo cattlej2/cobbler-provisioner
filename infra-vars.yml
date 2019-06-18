@@ -59,7 +59,7 @@ mirror_list:
 mirror_dict: "{{ mirror_list | items2dict(key_name='name', value_name='url') }}"
 
 # Use the following bonding mode examples
-# active-backup "mode=1 miimon=100"
+# active-backup "mode=1 miimon=100 primary=eth0"
 # active-active "mode=4 miimon=100 xmit_hash_policy=layer2+3" (Switch configuration required)
 systems_provisioned:
   - name: lhj-control-001
