@@ -46,7 +46,7 @@ mirror_list:
     url: http://mirror.kakao.com/centos/7.6.1810/updates/x86_64
   - name: extras
     url: http://mirror.kakao.com/centos/7.6.1810/extras/x86_64
-  - name: epel-7
+  - name: epel
     url: http://mirror.kakao.com/epel/7/x86_64
   - name: ceph-luminous
     url: http://download.ceph.com/rpm-luminous/el7/x86_64
