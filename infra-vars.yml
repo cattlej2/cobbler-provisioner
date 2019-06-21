@@ -9,7 +9,7 @@ dhcp_range_start: 192.168.201.104
 dhcp_range_end: 192.168.201.210
 
 cobbler_server_ip: 192.168.201.103
-cobbler_httpd_port: 8888
+cobbler_httpd_port: 80
 chrony_client_net: 192.168.201.0/24
 
 iso_filename: CentOS-7-x86_64-Minimal-1810.iso
@@ -70,8 +70,32 @@ systems_provisioned:
     mac_1st: 52:54:00:2c:c1:32
     interface_2nd: eth1
     mac_2nd: 52:54:00:0f:5e:b2
-    bonding_opts: "'mode=1 miimon=100'"
+    bonding_opts: "'mode=1 miimon=100 primary=eth0'"
     ip_address: 192.168.201.104
+    netmask: 255.255.255.0
+    mtu: 1500
+  - name: lhj-control-002
+    profile: "{{ os_release }}-{{ cpu_arch }}"
+    gateway: 192.168.201.1
+    name_servers: "'8.8.8.8 8.8.4.4'"
+    interface_1st: eth0
+    mac_1st: 52:54:00:ff:c1:63
+    interface_2nd: eth1
+    mac_2nd: 52:54:00:49:b6:f4
+    bonding_opts: "'mode=1 miimon=100 primary=eth0'"
+    ip_address: 192.168.201.105
+    netmask: 255.255.255.0
+    mtu: 1500
+  - name: lhj-control-003
+    profile: "{{ os_release }}-{{ cpu_arch }}"
+    gateway: 192.168.201.1
+    name_servers: "'8.8.8.8 8.8.4.4'"
+    interface_1st: eth0
+    mac_1st: 52:54:00:0e:58:6a
+    interface_2nd: eth1
+    mac_2nd: 52:54:00:a6:7a:af
+    bonding_opts: "'mode=1 miimon=100 primary=eth0'"
+    ip_address: 192.168.201.106
     netmask: 255.255.255.0
     mtu: 1500
   - name: lhj-vpc-001
@@ -82,55 +106,19 @@ systems_provisioned:
     mac_1st: 52:54:00:cf:16:44
     interface_2nd: eth1
     mac_2nd: 52:54:00:67:24:e6
-    bonding_opts: "'mode=1 miimon=100'"
-    ip_address: 192.168.201.105
-    netmask: 255.255.255.0
-    mtu: 1500
-  - name: lhj-ceph-001
-    profile: "{{ os_release }}-{{ cpu_arch }}"
-    gateway: 192.168.201.1
-    name_servers: "'8.8.8.8 8.8.4.4'"
-    interface_1st: eth0
-    mac_1st: 52:54:00:9f:76:93
-    interface_2nd: eth1
-    mac_2nd: 52:54:00:34:f9:fb
-    bonding_opts: "'mode=1 miimon=100'"
-    ip_address: 192.168.201.106
-    netmask: 255.255.255.0
-    mtu: 1500
-  - name: lhj-ceph-002
-    profile: "{{ os_release }}-{{ cpu_arch }}"
-    gateway: 192.168.201.1
-    name_servers: "'8.8.8.8 8.8.4.4'"
-    interface_1st: eth0
-    mac_1st: 52:54:00:69:a1:cf
-    interface_2nd: eth1
-    mac_2nd: 52:54:00:eb:3a:62
-    bonding_opts: "'mode=1 miimon=100'"
+    bonding_opts: "'mode=1 miimon=100 primary=eth0'"
     ip_address: 192.168.201.107
     netmask: 255.255.255.0
     mtu: 1500
-  - name: lhj-ceph-003
+  - name: lhj-vpc-002
     profile: "{{ os_release }}-{{ cpu_arch }}"
     gateway: 192.168.201.1
     name_servers: "'8.8.8.8 8.8.4.4'"
     interface_1st: eth0
-    mac_1st: 52:54:00:58:fb:29
+    mac_1st: 52:54:00:5f:3c:b5
     interface_2nd: eth1
-    mac_2nd: 52:54:00:91:36:d1
-    bonding_opts: "'mode=1 miimon=100'"
+    mac_2nd: 52:54:00:e7:ec:17
+    bonding_opts: "'mode=1 miimon=100 primary=eth0'"
     ip_address: 192.168.201.108
-    netmask: 255.255.255.0
-    mtu: 1500
-  - name: lhj-ceph-004
-    profile: "{{ os_release }}-{{ cpu_arch }}"
-    gateway: 192.168.201.1
-    name_servers: "'8.8.8.8 8.8.4.4'"
-    interface_1st: eth0
-    mac_1st: 52:54:00:5e:16:5c
-    interface_2nd: eth1
-    mac_2nd: 52:54:00:71:59:16
-    bonding_opts: "'mode=1 miimon=100'"
-    ip_address: 192.168.201.109
     netmask: 255.255.255.0
     mtu: 1500
